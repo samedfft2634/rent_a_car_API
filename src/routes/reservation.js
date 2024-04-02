@@ -1,4 +1,5 @@
 'use strict'
+/* __________________ Reservation Router __________________ */
 const router = require('express').Router()
 const reservation = require('../controllers/reservation')
 const {isAdmin,isLogin} = require('../middlewares/permissions')

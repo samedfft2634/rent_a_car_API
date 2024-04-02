@@ -3,7 +3,7 @@
 module.exports = {
     isLogin:async(req,res,next)=>{
         
-        return next()
+        // return next()
         if(req.user && req.user.isActive){
             next()
         } else{
@@ -14,7 +14,7 @@ module.exports = {
 
     isStaff: (req, res, next) => {
 
-        return next()
+        // return next()
         if (req.user && req.user.isActive && (req.user.isAdmin || req.user.isStaff)) {
             next()
         } else {
@@ -24,7 +24,7 @@ module.exports = {
     },
 
     isAdmin:async(req,res,next)=>{
-        return next()
+        // return next()
         if(req.user  && req.user.isActive && req.user.isAdmin){
             next()
         } else{

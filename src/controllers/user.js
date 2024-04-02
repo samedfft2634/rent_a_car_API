@@ -30,9 +30,10 @@ module.exports = {
             #swagger.summary = "Create User"
         */
 
-		   if(!req.user || !req.user.isAdmin){
-		    req.body.isAdmin = false
-		   }
+		if (!req.user || !req.user.isAdmin) {
+			req.body.isAdmin = false;
+			req.body.isStaff = false;
+		}
 		const data = await User.create(req.body);
 		res.status(201).send({
 			error: false,
@@ -45,36 +46,47 @@ module.exports = {
             #swagger.summary = "Get Single User"
         */
 
-		let customFilter = {};
-		if (!req.user.isAdmin) {
+		
+		let customFilter = { _id: req.params.id };
+		if (!req.user.isAdmin && !req.user.isStaff) {
 			customFilter = { _id: req.user._id };
 		}
-		const data = await User.findOne({
-			_id: req.params.id,
-			...customFilter,
-		});
+
+		const data = await User.findOne(customFilter);
 		res.status(200).send({
 			error: false,
 			data,
 		});
 	},
 	update: async (req, res) => {
-		/*
+		   /*
             #swagger.tags = ["Users"]
             #swagger.summary = "Update User"
+            #swagger.parameters['body'] = {
+                in: 'body',
+                required: true,
+                schema: {
+                    "username": "test",
+                    "password": "1234",
+                    "email": "test@site.com",
+                    "isActive": true,
+                    "isStaff": false,
+                    "isAdmin": false,
+                }
+            }
         */
-		if( !req.user.isAdmin){
-		    req.body.isAdmin = false
-		   }
-		let customFilter = {};
-		if (!req.user.isAdmin) {
-			customFilter = { _id: req.user._id };
-		}
-		const data = await User.updateOne(
-			{ _id: req.params.id, ...customFilter },
-			req.body,
-			{ runValidators: true }
-		);
+
+        if (!req.user.isAdmin) {
+            delete req.body.isStaff
+            delete req.body.isAdmin
+        }
+
+        let customFilter = { _id: req.params.id }
+        if (!req.user.isAdmin && !req.user.isStaff) {
+            customFilter = { _id: req.user._id }
+        }
+
+        const data = await User.updateOne(customFilter, req.body, { runValidators: true })
 		res.status(202).send({
 			error: false,
 			data,
