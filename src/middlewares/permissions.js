@@ -1,8 +1,9 @@
 'use strict'
 /* __________________ Permissions __________________ */
 module.exports = {
-    isLogin:async(req,res)=>{
-
+    isLogin:async(req,res,next)=>{
+        
+        return next()
         if(req.user && req.user.isActive){
             next()
         } else{
@@ -10,7 +11,20 @@ module.exports = {
             throw new Error('NoPermission: You must login.')
         }
     },
-    isAdmin:async(req,res)=>{
+
+    isStaff: (req, res, next) => {
+
+        return next()
+        if (req.user && req.user.isActive && (req.user.isAdmin || req.user.isStaff)) {
+            next()
+        } else {
+            res.errorStatusCode = 403
+            throw new Error('NoPermission: You must login and to be Admin.')
+        }
+    },
+
+    isAdmin:async(req,res,next)=>{
+        return next()
         if(req.user  && req.user.isActive && req.user.isAdmin){
             next()
         } else{

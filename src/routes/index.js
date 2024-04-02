@@ -15,7 +15,7 @@ router.use('/reservations', require('./reservation'))
 router.use('/cars', require('./car'))
 
 // document:
-// router.use('/documents', require('./document'))
+router.use('/documents', require('./document'))
 
 /* ------------------------------------------------------- */
 module.exports = router

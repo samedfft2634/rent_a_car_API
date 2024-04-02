@@ -1,16 +1,16 @@
 'use strict'
 const router = require('express').Router()
-const car = require('../controllers/car')
-const {isAdmin,isLogin} = require('../middlewares/permissions')
+const {list,create,read,update,delete:deleteCar} = require('../controllers/car')
+const {isAdmin,isStaff} = require('../middlewares/permissions')
 
 router.route('/')
-.get(isLogin,car.list)
-.post(isAdmin,car.create)
+.get( list) // Everyone can list.
+.post(isAdmin, create)
 
 router.route('/:id')
-.get(isAdmin,car.read)
-.put(isAdmin,car.update)
-.patch(isAdmin,car.update)
-.delete(isAdmin,car.delete)
+.get( read)
+.put(isStaff, update)
+.patch(isStaff, update)
+.delete(isAdmin, deleteCar)
 
 module.exports = router

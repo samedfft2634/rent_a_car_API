@@ -25,10 +25,22 @@ module.exports = {
        })
     },
 	create: async (req, res) => {
-        /*
+           /*
             #swagger.tags = ["Cars"]
             #swagger.summary = "Create Car"
+            #swagger.parameters['body'] = {
+                in: 'body',
+                required: true,
+                schema: {
+                    $ref: '#/definitions/Car'
+                }
+            }
         */
+
+         // createdId ve updatedId verisini req.user'dan al:
+         req.body.createdId = req.user._id
+         req.body.updatedId = req.user._id
+
        const data = await Car.create(req.body);
        res.status(201).send({
         error:false,
@@ -52,9 +64,16 @@ module.exports = {
        })
     },
 	update: async (req, res) => {
-        /*
+         /*
             #swagger.tags = ["Cars"]
             #swagger.summary = "Update Car"
+            #swagger.parameters['body'] = {
+                in: 'body',
+                required: true,
+                schema: {
+                    $ref: '#/definitions/Car'
+                }
+            }
         */
         const data = await Car.updateOne({_id:req.params.id,...customFilter},req.body,{runValidators:true})
         res.status(202).send({

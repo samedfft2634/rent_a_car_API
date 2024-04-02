@@ -20,22 +20,26 @@ const CarSchema = new mongoose.Schema({
         trim:true,
         required:true,
     },
-    year:{
-        type:Number,
-        required:true,
+    year: {
+        type: Number,
+        min: 1950,
+        max: new Date().getFullYear(), 
+        required: true
     },
     isAutomatic:{
         type:Boolean,
-        required:true,
         default:false
     },
     pricePerDay:{
         type:Number,
         required:true,
     },
+    images: {
+        type: Array,
+        default: []
+    },
     isPublish:{
         type:Boolean,
-        required:true,
         default:true,
     },
     createdId:{
