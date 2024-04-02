@@ -1,19 +1,19 @@
 'use strict'
 /* __________________ Token Router __________________ */
 const router = require('express').Router()
-const token = require('../controllers/token')
+const {list, create, read, update, delete:deleteToken} = require('../controllers/token')
 const {isAdmin} = require('../middlewares/permissions')
 
 router.use(isAdmin)
 
 router.route('/')
-.get(token.list)
-.post(token.create)
+.get(list)
+.post(create)
 
 router.route('/:id')
-.get(token.read)
-.put(token.update)
-.patch(token.update)
-.delete(token.delete)
+.get(read)
+.put(update)
+.patch(update)
+.delete(deleteToken)
 
 module.exports = router
