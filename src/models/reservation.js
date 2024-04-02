@@ -23,6 +23,10 @@ const ReservationSchema = new mongoose.Schema({
         required:true,
         index:true,
     },
+    startDate:{
+        type:Date,
+        required:true,
+    },
     endDate:{
         type:Date,
         required:true,
@@ -31,10 +35,22 @@ const ReservationSchema = new mongoose.Schema({
         },
         message:"End Date must be greater than start date!"
     },
-    startDate:{
-        type:Date,
-        required:true,
+    amount: {
+        type: Number,
+        required: true
     },
+
+    createdId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        required: true
+    },
+
+    updatedId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        required: true
+    }
  
 },{
     collection:'reservations',

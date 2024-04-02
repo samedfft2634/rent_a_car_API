@@ -25,11 +25,26 @@ module.exports = {
        })
     },
 	create: async (req, res) => {
-        /*
+         /*
             #swagger.tags = ["Reservations"]
             #swagger.summary = "Create Reservation"
+            #swagger.parameters['body'] = {
+                in: 'body',
+                required: true,
+                schema: {
+                    $ref: '#/definitions/Reservation'
+                }
+            }
         */
-       const data = await Reservation.create(req.body);
+
+        if ((!req.user.isAdmin && !req.user.isStaff) || !req.body?.userId) {
+            req.body.userId = req.user._id
+        }
+
+        req.body.createdId = req.user._id
+        req.body.updatedId = req.user._id
+
+        const data = await Reservation.create(req.body)
        res.status(201).send({
         error:false,
         data,
@@ -41,15 +56,12 @@ module.exports = {
             #swagger.summary = "Get Single Reservation"
         */
 
-		let customFilter = {}; 
-		// if (!req.user.isAdmin) {
-		// 	customFilter = { _id: req.user.id };
-        //     if(req.data == null){
-        //         res.errorStatusCode = 403
-        //         throw new Error("No Permission:You must be Admin to see other reservations.");
-        //     }
-		// }
-        const data = await Reservation.findOne({_id:req.params.id,...customFilter}).populate(['userId','carId'])
+            let customFilter = { _id: req.params.id };
+            if (!req.user.isAdmin && !req.user.isStaff) {
+                customFilter = { _id: req.user._id };
+            }
+    
+            const data = await User.findOne(customFilter).populate(['userId','carId']);
        res.status(200).send({
         error:false,
         data,
@@ -60,8 +72,23 @@ module.exports = {
         /*
             #swagger.tags = ["Reservations"]
             #swagger.summary = "Update Reservation"
+            #swagger.parameters['body'] = {
+                in: 'body',
+                required: true,
+                schema: {
+                    $ref: '#/definitions/Reservation'
+                }
+            }
         */
-        const data = await Reservation.updateOne({_id:req.params.id,...customFilter},req.body,{runValidators:true})
+
+        // Only Admin can change reservastion informations.
+        if (!req.user.isAdmin) {
+            delete req.body.userId
+        }
+
+        // Take updateId from user
+        req.body.updatedId = req.user._id
+
         res.status(202).send({
             error:false,
             data,
@@ -79,7 +106,4 @@ module.exports = {
         data
        })
     },
-    listreservs:async(req,res)=>{
-        
-    }
 };
