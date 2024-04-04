@@ -4,7 +4,7 @@ const Car = require("../models/car");
 
 module.exports = {
 	list: async (req, res) => {
-        /*
+		/*
             #swagger.tags = ["Cars"]
             #swagger.summary = "List Cars"
             #swagger.description = `
@@ -17,15 +17,21 @@ module.exports = {
                 </ul>
             `
         */
-       const data = await res.getModelList(Car)
-       res.status(200).send({
-        error:false,
-        details: await res.getModelListDetails(Car),
-        data
-       })
-    },
+
+		let customFilter = { isPublish: true };
+
+		const data = await res.getModelList(Car, customFilter,[
+			{path:'createdId', select:'username'},
+			{path:'updatedId', select:'username'},
+		]);
+		res.status(200).send({
+			error: false,
+			details: await res.getModelListDetails(Car, customFilter),
+			data,
+		});
+	},
 	create: async (req, res) => {
-           /*
+		/*
             #swagger.tags = ["Cars"]
             #swagger.summary = "Create Car"
             #swagger.parameters['body'] = {
@@ -37,34 +43,37 @@ module.exports = {
             }
         */
 
-         // createdId ve updatedId verisini req.user'dan al:
-         req.body.createdId = req.user._id
-         req.body.updatedId = req.user._id
+		// createdId ve updatedId verisini req.user'dan al:
+		req.body.createdId = req.user._id;
+		req.body.updatedId = req.user._id;
 
-       const data = await Car.create(req.body);
-       res.status(201).send({
-        error:false,
-        data,
-       })
-    },
+		const data = await Car.create(req.body);
+		res.status(201).send({
+			error: false,
+			data,
+		});
+	},
 	read: async (req, res) => {
-        /*
+		/*
             #swagger.tags = ["Cars"]
             #swagger.summary = "Get Single Car"
         */
 
-		let customFilter = {}; 
+		let customFilter = {};
 		if (!req.user.isAdmin) {
 			customFilter = { _id: req.user._id };
 		}
-       const data = await Car.findOne({_id:req.params.id,...customFilter})
-       res.status(200).send({
-        error:false,
-        data,
-       })
-    },
+		const data = await Car.findOne({ _id: req.params.id, ...customFilter }).populate([
+			{path:'createdId', select:'username'},
+			{path:'updatedId', select:'username'},
+		]);
+		res.status(200).send({
+			error: false,
+			data,
+		});
+	},
 	update: async (req, res) => {
-         /*
+		/*
             #swagger.tags = ["Cars"]
             #swagger.summary = "Update Car"
             #swagger.parameters['body'] = {
@@ -75,22 +84,26 @@ module.exports = {
                 }
             }
         */
-        const data = await Car.updateOne({_id:req.params.id,...customFilter},req.body,{runValidators:true})
-        res.status(202).send({
-            error:false,
-            data,
-            new:await Car.findOne({_id:req.params.id})
-        })
-    },
+		const data = await Car.updateOne(
+			{ _id: req.params.id, ...customFilter },
+			req.body,
+			{ runValidators: true }
+		);
+		res.status(202).send({
+			error: false,
+			data,
+			new: await Car.findOne({ _id: req.params.id }),
+		});
+	},
 	delete: async (req, res) => {
-        /*
+		/*
             #swagger.tags = ["Cars"]
             #swagger.summary = "Delete Car"
         */
-       const data = await Car.deleteOne({_id:req.params.id})
-       res.status(data.deletedCount ? 204 : 404).send({
-        error:!data.deletedCount,
-        data
-       })
-    },
+		const data = await Car.deleteOne({ _id: req.params.id });
+		res.status(data.deletedCount ? 204 : 404).send({
+			error: !data.deletedCount,
+			data,
+		});
+	},
 };

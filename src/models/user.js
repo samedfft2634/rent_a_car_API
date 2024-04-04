@@ -11,6 +11,10 @@ const passwordEncrypt = require("../helpers/passwordEncrypt");
     "lastName": "Acar",
     "isActive": true,
     "isAdmin": true
+},
+{
+	"username": "admin",
+    "password": "aA?123456",
 }
 /* ______________________________________________ */
 const UserSchema = new mongoose.Schema(

@@ -1,7 +1,36 @@
 'use strict'
 /* ___________________ Car Modal __________________ */
 const {mongoose} = require('../configs/dbConnection')
-
+/* ______________________________________________ *
+{
+    "plateNumber": "34ABC123",
+    "brand": "Ford",
+    "model": "Focus",
+    "year": 2020,
+    "isAutomatic": true,
+    "pricePerDay": 249.99,
+    "isAvailable":true    
+}
+{
+    "plateNumber": "34ABC234",
+    "brand": "Renault",
+    "model": "Megane",
+    "year": 2022,
+    "isAutomatic": false,
+    "pricePerDay": 199.99,
+    "isAvailable":true
+}
+{
+    "plateNumber": "34ABC345",
+    "brand": "Opel",
+    "model": "Astra",
+    "year": 2021,
+    "isAutomatic": false,
+    "pricePerDay": 189.99,
+    "isAvailable":true
+  
+}
+/* ______________________________________________ */
 const CarSchema = new mongoose.Schema({
     
     plateNumber:{

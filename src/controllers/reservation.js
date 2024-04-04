@@ -17,10 +17,20 @@ module.exports = {
                 </ul>
             `
         */
-       const data = await res.getModelList(Reservation,{},['userId','carId'])
+
+        let customFilter = { };
+		if (!req.user.isAdmin && !req.user.isStaff) {
+			customFilter = { userId: req.user._id };
+		}    
+       const data = await res.getModelList(Reservation,customFilter,[
+        {path:'userId', select:'username firstName lastName'},
+        {path:'carId'}, // get all details about car.
+        {path:'createdId', select:'username'},
+        {path:'updatedId', select:'username'},
+    ])
        res.status(200).send({
         error:false,
-        details: await res.getModelListDetails(Reservation),
+        details: await res.getModelListDetails(Reservation,customFilter),
         data
        })
     },
@@ -56,12 +66,17 @@ module.exports = {
             #swagger.summary = "Get Single Reservation"
         */
 
-            let customFilter = { _id: req.params.id };
+            let customFilter = { };
             if (!req.user.isAdmin && !req.user.isStaff) {
-                customFilter = { _id: req.user._id };
-            }
+                customFilter = { userId: req.user._id };
+            }   
     
-            const data = await User.findOne(customFilter).populate(['userId','carId']);
+            const data = await User.findOne({_id:req.params.id,...customFilter}).populate([
+                {path:'userId', select:'username firstName lastName'},
+                {path:'carId'}, 
+                {path:'createdId', select:'username'},
+                {path:'updatedId', select:'username'},
+            ]);
        res.status(200).send({
         error:false,
         data,
@@ -88,6 +103,8 @@ module.exports = {
 
         // Take updateId from user
         req.body.updatedId = req.user._id
+
+        const data = await Reservation.updateOne({ _id: req.params.id }, req.body, { runValidators: true })
 
         res.status(202).send({
             error:false,
