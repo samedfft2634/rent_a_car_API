@@ -1,6 +1,7 @@
 "use strict";
 /* ________________ Car Controller ________________ */
 const Car = require("../models/car");
+const Reservation = require("../models/reservation");
 
 module.exports = {
 	list: async (req, res) => {
@@ -18,11 +19,38 @@ module.exports = {
             `
         */
 
+		// example car filtering
+		// http://127.0.0.1:8000/cars?startDate=2024-03-15&endDate=2024-04-05
+
 		let customFilter = { isPublish: true };
 
-		const data = await res.getModelList(Car, customFilter,[
-			{path:'createdId', select:'username'},
-			{path:'updatedId', select:'username'},
+		// Filter by Date
+		const { startDate: getStartDate, endDate: getEndDate } = req.query;
+
+		if (getStartDate && getEndDate) {
+			const reservedCars = await Reservation.find({
+				$nor: [
+					{ startDate: { $gt: getEndDate } },
+					{ endDate: { $lt: getStartDate } },
+				],
+			},{_id:0,carId:1}).distinct('carId');
+
+			if(reservedCars.length > 0){
+				customFilter._id = {$nin:reservedCars}
+			}
+			// console.log(reservedCars);
+			console.log(customFilter)
+		} else {
+			req.errorStatusCode = 400; // Bad request
+			throw new Error("startDate and endDate queries are required.");
+		}
+
+		
+		// Filter by Date
+
+		const data = await res.getModelList(Car, customFilter, [
+			{ path: "createdId", select: "username" },
+			{ path: "updatedId", select: "username" },
 		]);
 		res.status(200).send({
 			error: false,
@@ -63,9 +91,12 @@ module.exports = {
 		if (!req.user.isAdmin) {
 			customFilter = { _id: req.user._id };
 		}
-		const data = await Car.findOne({ _id: req.params.id, ...customFilter }).populate([
-			{path:'createdId', select:'username'},
-			{path:'updatedId', select:'username'},
+		const data = await Car.findOne({
+			_id: req.params.id,
+			...customFilter,
+		}).populate([
+			{ path: "createdId", select: "username" },
+			{ path: "updatedId", select: "username" },
 		]);
 		res.status(200).send({
 			error: false,
